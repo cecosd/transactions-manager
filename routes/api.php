@@ -16,3 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/transactions-manager/data', function () {
+    return response()->json((new \App\Services\TransactionService())->getAllTransactions());
+})->name('transactions-manager-get-data');
