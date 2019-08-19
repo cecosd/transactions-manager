@@ -18,12 +18,9 @@ class UsersTableSeeder extends Seeder
             factory(App\UserTransactionAccount::class)->create([
                 'user_id' => $user->id
             ])->each(function ($transactionAccount){
-                
-                $transactionTypes = ['Debit', 'Credit'];
-                
+
                 factory(App\Transaction::class)->create([
                     'account_id' => $transactionAccount->id,
-                    'type' => $transactionTypes[array_rand($transactionTypes, 1)],
                 ]);
 
             });

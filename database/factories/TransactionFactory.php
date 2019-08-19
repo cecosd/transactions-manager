@@ -18,10 +18,15 @@ use Faker\Generator as Faker;
 */
 
 $factory->define(Transaction::class, function (Faker $faker){
+    $transactionTypes = ['Debit', 'Credit'];        
+    $type = $transactionTypes[array_rand($transactionTypes, 1)];
+
+    $amount = $faker->numberBetween(100, 800);
+
     return [
         'account_id' => NULL,
-        'amount' => $faker->numberBetween(100, 800),
+        'amount' => ($type == 'Debit' ? -$amount : $amount),
         'currency' => '$',
-        'type' => NULL,
+        'type' => $type,
     ];
 });
