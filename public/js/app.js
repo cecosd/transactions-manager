@@ -1922,6 +1922,45 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'TransactionsManager',
@@ -1929,14 +1968,36 @@ __webpack_require__.r(__webpack_exports__);
     data_route: {
       type: String,
       required: true
+    },
+    create_route: {
+      type: String,
+      required: true
     }
   },
   data: function data() {
     return {
-      transactions: []
+      transactions: [],
+      accounts_dropdown_list: {},
+      search_query: '',
+      new_transaction_mode: false,
+      new_transaction: {
+        amount: null,
+        type: null,
+        user_email: null
+      },
+      validationErrors: []
     };
   },
-  computed: {},
+  computed: {
+    formattedTransactions: function formattedTransactions() {
+      var vm = this;
+      var query = vm.search_query;
+      return this.transactions.filter(function (transaction) {
+        vm.accounts_dropdown_list[transaction.account_user_email] = transaction.account_user_name;
+        return transaction.amount.indexOf(query) > -1 || transaction.account_user_name.indexOf(query) > -1 || transaction.account_user_email.indexOf(query) > -1 || transaction.type.indexOf(query) > -1 ? true : false;
+      });
+    }
+  },
   methods: {
     getData: function getData() {
       var _this = this;
@@ -1945,6 +2006,51 @@ __webpack_require__.r(__webpack_exports__);
         _this.transactions = response.data;
       })["catch"](function (err) {
         console.log(err);
+      });
+    },
+    isDebit: function isDebit(type) {
+      return type == 'Debit';
+    },
+    isCredit: function isCredit(type) {
+      return type == 'Credit';
+    },
+    sortByName: function sortByName(order) {
+      if (order == 'asc') return this.transactions.sort(function (a, b) {
+        return a.account_user_name < b.account_user_name ? 1 : -1;
+      });else if (order == 'desc') return this.transactions.sort(function (a, b) {
+        return a.account_user_name > b.account_user_name ? 1 : -1;
+      });else return this.transactions;
+    },
+    sortById: function sortById(order) {
+      if (order == 'asc') return this.transactions.sort(function (a, b) {
+        return a.id > b.id ? 1 : -1;
+      });else if (order == 'desc') return this.transactions.sort(function (a, b) {
+        return a.id < b.id ? 1 : -1;
+      });else return this.transactions;
+    },
+    toggleNewMode: function toggleNewMode() {
+      this.clearFormValidationErrors();
+      this.new_transaction_mode = !this.new_transaction_mode;
+    },
+    clearFormValidationErrors: function clearFormValidationErrors() {
+      this.validationErrors = [];
+    },
+    clearAddTransactionForm: function clearAddTransactionForm() {
+      for (var index in this.new_transaction) {
+        this.new_transaction[index] = null;
+      }
+    },
+    addTransaction: function addTransaction() {
+      var _this2 = this;
+
+      this.toggleNewMode();
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(this.create_route, this.new_transaction).then(function (response) {// this.transactions.push(response.data);
+      })["catch"](function (error) {
+        if (error.response.status == 422) {
+          _this2.validationErrors = error.response.data.errors;
+        }
+      })["finally"](function () {
+        _this2.clearAddTransactionForm();
       });
     }
   },
@@ -37297,79 +37403,39 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _vm._m(0),
-    _vm._v(" "),
-    _vm._m(1),
-    _vm._v(" "),
-    _c("table", { staticClass: "table" }, [
-      _vm._m(2),
-      _vm._v(" "),
-      _c(
-        "tbody",
-        _vm._l(_vm.transactions, function(transaction) {
-          return _c("tr", { key: transaction.id }, [
-            _c("td", [_vm._v(_vm._s(transaction.id))]),
-            _vm._v(" "),
-            _c("td", [
-              _vm._v(
-                _vm._s(transaction.transaction_account.user.name) +
-                  "(" +
-                  _vm._s(transaction.transaction_account.balance) +
-                  ")"
-              )
-            ]),
-            _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(transaction.type))]),
-            _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(transaction.amount))])
-          ])
-        }),
-        0
-      )
-    ]),
-    _vm._v(" "),
-    _c(
-      "button",
-      { staticClass: "btn btn-primary", attrs: { type: "button" } },
-      [_vm._v("\n        Add transaction\n    ")]
-    )
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-lg-3" }, [
+    _c("div", { staticClass: "col-lg-3" }, [
       _c("div", { staticClass: "input-group mb-3" }, [
         _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.search_query,
+              expression: "search_query"
+            }
+          ],
           staticClass: "form-control",
           attrs: {
             type: "text",
             placeholder: "Type here...",
-            "aria-label": "Type here",
-            "aria-describedby": "button-addon2"
+            "aria-label": "Type here"
+          },
+          domProps: { value: _vm.search_query },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.search_query = $event.target.value
+            }
           }
         }),
         _vm._v(" "),
-        _c("div", { staticClass: "input-group-append" }, [
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-outline-primary",
-              attrs: { type: "button", id: "button-addon2" }
-            },
-            [_vm._v("Search")]
-          )
-        ])
+        _vm._m(0)
       ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-lg-3" }, [
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "col-lg-3" }, [
       _c("div", { staticClass: "btn-group" }, [
         _c(
           "button",
@@ -37386,23 +37452,264 @@ var staticRenderFns = [
         ),
         _vm._v(" "),
         _c("div", { staticClass: "dropdown-menu" }, [
-          _c("a", { staticClass: "dropdown-item", attrs: { href: "#" } }, [
-            _vm._v("ID Asc")
-          ]),
+          _c(
+            "a",
+            {
+              staticClass: "dropdown-item",
+              on: {
+                click: function($event) {
+                  return _vm.sortById("asc")
+                }
+              }
+            },
+            [_vm._v("ID Asc")]
+          ),
           _vm._v(" "),
-          _c("a", { staticClass: "dropdown-item", attrs: { href: "#" } }, [
-            _vm._v("ID Desc")
-          ]),
+          _c(
+            "a",
+            {
+              staticClass: "dropdown-item",
+              on: {
+                click: function($event) {
+                  return _vm.sortById("desc")
+                }
+              }
+            },
+            [_vm._v("ID Desc")]
+          ),
           _vm._v(" "),
-          _c("a", { staticClass: "dropdown-item", attrs: { href: "#" } }, [
-            _vm._v("Name Asc")
-          ]),
+          _c(
+            "a",
+            {
+              staticClass: "dropdown-item",
+              on: {
+                click: function($event) {
+                  return _vm.sortByName("asc")
+                }
+              }
+            },
+            [_vm._v("Name Asc")]
+          ),
           _vm._v(" "),
-          _c("a", { staticClass: "dropdown-item", attrs: { href: "#" } }, [
-            _vm._v("Name Desc")
-          ])
+          _c(
+            "a",
+            {
+              staticClass: "dropdown-item",
+              on: {
+                click: function($event) {
+                  return _vm.sortByName("desc")
+                }
+              }
+            },
+            [_vm._v("Name Desc")]
+          )
         ])
       ])
+    ]),
+    _vm._v(" "),
+    _c("table", { staticClass: "table" }, [
+      _vm._m(1),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        _vm._l(_vm.formattedTransactions, function(transaction) {
+          return _c(
+            "tr",
+            {
+              key: transaction.id,
+              class: {
+                "table-danger": transaction.is_debit,
+                "table-success": transaction.is_credit
+              }
+            },
+            [
+              _c("td", [_vm._v(_vm._s(transaction.id))]),
+              _vm._v(" "),
+              _c("td", [
+                _vm._v(
+                  _vm._s(transaction.account_user_name) +
+                    "(" +
+                    _vm._s(transaction.account_balance) +
+                    ")"
+                )
+              ]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(transaction.type))]),
+              _vm._v(" "),
+              _c("td", [_vm._v(_vm._s(transaction.formatted_amount))])
+            ]
+          )
+        }),
+        0
+      )
+    ]),
+    _vm._v(" "),
+    _vm.new_transaction_mode
+      ? _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "col-lg-3" }, [
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.new_transaction.user_email,
+                    expression: "new_transaction.user_email"
+                  }
+                ],
+                staticClass: "form-control",
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.$set(
+                      _vm.new_transaction,
+                      "user_email",
+                      $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+                    )
+                  }
+                }
+              },
+              _vm._l(_vm.accounts_dropdown_list, function(
+                list_item_name,
+                list_item_email
+              ) {
+                return _c(
+                  "option",
+                  {
+                    key: list_item_email,
+                    domProps: { value: list_item_email }
+                  },
+                  [_vm._v(_vm._s(list_item_name))]
+                )
+              }),
+              0
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-lg-3" }, [
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.new_transaction.type,
+                    expression: "new_transaction.type"
+                  }
+                ],
+                staticClass: "form-control",
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.$set(
+                      _vm.new_transaction,
+                      "type",
+                      $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+                    )
+                  }
+                }
+              },
+              [
+                _c("option", { attrs: { value: "Debit" } }, [_vm._v("Debit")]),
+                _vm._v(" "),
+                _c("option", { attrs: { value: "Credit" } }, [_vm._v("Credit")])
+              ]
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-lg-3" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.new_transaction.amount,
+                  expression: "new_transaction.amount"
+                }
+              ],
+              staticClass: "form-control",
+              attrs: {
+                type: "number",
+                min: "1",
+                placeholder: "Amount",
+                "aria-label": "Amount"
+              },
+              domProps: { value: _vm.new_transaction.amount },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.new_transaction, "amount", $event.target.value)
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-lg-3" }, [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-primary",
+                on: {
+                  click: function($event) {
+                    return _vm.addTransaction()
+                  }
+                }
+              },
+              [_vm._v("Submit")]
+            )
+          ])
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    !_vm.new_transaction_mode
+      ? _c(
+          "button",
+          {
+            staticClass: "btn btn-primary",
+            on: {
+              click: function($event) {
+                return _vm.toggleNewMode()
+              }
+            }
+          },
+          [_vm._v("\n        Add transaction\n    ")]
+        )
+      : _vm._e(),
+    _vm._v(" "),
+    _c(
+      "ul",
+      _vm._l(_vm.validationErrors, function(error, error_key) {
+        return _c("li", { key: error_key }, [_vm._v(_vm._s(error[0]))])
+      }),
+      0
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "input-group-append" }, [
+      _c("div", { staticClass: "btn btn-outline-primary" }, [_vm._v("Search")])
     ])
   },
   function() {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Requests\NewTransactionRequest;
 use Illuminate\Http\Request;
 
 /*
@@ -20,3 +21,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/transactions-manager/data', function () {
     return response()->json((new \App\Services\TransactionService())->getAllTransactions());
 })->name('transactions-manager-get-data');
+
+Route::post('/transactions-manager/store', function (NewTransactionRequest $request) {
+    return response()->json((new \App\Services\TransactionService())->storeTransaction($request));
+})->name('transactions-manager-create-transaction');
