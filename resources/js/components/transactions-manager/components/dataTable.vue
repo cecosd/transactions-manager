@@ -12,7 +12,7 @@
             </thead>
             <tbody>
                 <tr 
-                    v-for="(transaction, transaction_index) in transactions" :key="transaction.id"
+                    v-for="(transaction, transaction_index) in formattedTransactions" :key="transaction.id"
                     :class="{'table-danger': transaction.is_debit, 'table-success': transaction.is_credit}"
                 >
                     <td>{{transaction.id}}</td>
@@ -36,7 +36,7 @@
                         </div>
                     </td>
                     <td>{{transaction.formatted_amount}}</td>
-                    <td><button class="btn btn-danger float-lg-right" @click="deleteRecord(transaction_index)" type="button">Delete</button></td>
+                    <td><button class="btn btn-danger float-lg-right" @click="deleteRecord(transaction_index)" type="button"><font-awesome-icon icon="trash" /></button></td>
                 </tr>
             </tbody>
         </table>
