@@ -47400,7 +47400,12 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("update")]
+                            [
+                              _c("font-awesome-icon", {
+                                attrs: { icon: "check" }
+                              })
+                            ],
+                            1
                           ),
                           _vm._v(" "),
                           _c(
@@ -47414,7 +47419,12 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("discard")]
+                            [
+                              _c("font-awesome-icon", {
+                                attrs: { icon: "times" }
+                              })
+                            ],
+                            1
                           )
                         ])
                       ])
@@ -47642,7 +47652,11 @@ var render = function() {
               }
             }
           },
-          [_vm._v("\n       Add transaction\n    ")]
+          [
+            _c("font-awesome-icon", { attrs: { icon: "pencil-alt" } }),
+            _vm._v(" Add transaction\n    ")
+          ],
+          1
         )
       : _vm._e(),
     _vm._v(" "),
@@ -59990,7 +60004,9 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
 
 
-_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__["library"].add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_1__["faUserSecret"]);
+_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__["library"].add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_1__["faPencilAlt"]);
+_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__["library"].add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_1__["faTimes"]);
+_fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_0__["library"].add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_1__["faCheck"]);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

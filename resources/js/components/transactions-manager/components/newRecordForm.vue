@@ -25,7 +25,7 @@
             </div>
         </div>
         <button v-if="!show_form" class="btn btn-primary" @click="toggleNewMode()">
-           Add transaction
+            <font-awesome-icon icon="pencil-alt" /> Add transaction
         </button>
         <ul>
             <li v-for="(error, error_key) in validationErrors" :key="error_key">{{error[0]}}</li>

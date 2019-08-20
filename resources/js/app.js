@@ -9,10 +9,12 @@ require('./bootstrap');
 window.Vue = require('vue');
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { faPencilAlt, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faUserSecret)
+library.add(faPencilAlt)
+library.add(faTimes)
+library.add(faCheck)
 
 /**
  * The following block of code may be used to automatically register your

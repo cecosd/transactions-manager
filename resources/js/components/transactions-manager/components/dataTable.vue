@@ -29,8 +29,8 @@
                                     <option v-if="transaction.type != 'Credit'" value="Credit">Credit</option>
                                 </select>
                                 <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" @click="confirmChange()" type="button">update</button>
-                                    <button class="btn btn-outline-secondary" @click="discardChange()" type="button">discard</button>
+                                    <button class="btn btn-outline-secondary" @click="confirmChange()" type="button"><font-awesome-icon icon="check" /></button>
+                                    <button class="btn btn-outline-secondary" @click="discardChange()" type="button"><font-awesome-icon icon="times" /></button>
                                 </div>
                             </div>
                         </div>
