@@ -7,6 +7,7 @@
                     <th scope="col">User(Balance)</th>
                     <th scope="col">Type</th>
                     <th scope="col">Amount</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -20,8 +21,22 @@
                         <div v-if="transaction_index != edit_form.index" v-on:dblclick="counter += 1, edit(transaction_index, 'type')">
                             {{transaction.type}}
                         </div>
+                        <div v-if="edit_mode && transaction_index == edit_form.index && edit_form.field == 'type'">
+                            <div class="input-group">
+                                <select v-model="edit_form.value" class="custom-select form-control">
+                                    <option :value="transaction.type" selected>{{transaction.type}}</option>
+                                    <option v-if="transaction.type != 'Debit'" value="Debit">Debit</option>
+                                    <option v-if="transaction.type != 'Credit'" value="Credit">Credit</option>
+                                </select>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" @click="confirmChange()" type="button">update</button>
+                                    <button class="btn btn-outline-secondary" @click="discardChange()" type="button">discard</button>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                     <td>{{transaction.formatted_amount}}</td>
+                    <td><button class="btn btn-danger float-lg-right" @click="deleteRecord(transaction_index)" type="button">Delete</button></td>
                 </tr>
             </tbody>
         </table>
@@ -29,14 +44,25 @@
 </template>
 
 <script>
-
 export default {
     name: 'dataTable',
     props: {
         transactions: {
             type: Array,
             required: true,
-        }
+        },
+        update_route: {
+            type: String,
+            required: true
+        },
+        delete_route: {
+            type: String,
+            required: true
+        },
+        search_query: {
+            type: String,
+            required: true
+        },
     },
     data() {
         return {
@@ -44,9 +70,22 @@ export default {
             edit_mode: false,
             edit_form: {
                 index: null,
-                field: null
+                field: null,
+                value: null
             },
             
+        }
+    },
+    computed: {
+        formattedTransactions: function(){
+            var vm = this;
+            var query = vm.search_query;
+            return this.transactions.filter(function(transaction){              
+                return (transaction.amount.indexOf(query) > -1
+                        || transaction.account_user_name.indexOf(query) > -1
+                        || transaction.account_user_email.indexOf(query) > -1
+                        || transaction.type.indexOf(query) > -1) ? true : false;
+            });
         }
     },
     methods: {
@@ -60,15 +99,47 @@ export default {
             this.edit_mode = false;
             this.edit_form.index = null;
             this.edit_form.field = null;
+            this.edit_form.value = null;
         },
         confirmChange: function()
         {
             var transaction = this.transactions[this.edit_form.index];
-            transaction[this.edit_form.field]
+            transaction[this.edit_form.field] = this.edit_form.value;
+            
+            axios
+                .put(this.update_route, transaction)
+                .then(response => {
+                    this.$emit('singleTransactionUpdated', {
+                        index: this.edit_form.index,
+                        transaction: response.data.original
+                    });
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+                .finally(() => {
+                    this.clearForm();
+                });
         },
         discardChange: function()
         {
             this.clearForm();
+        },
+        deleteRecord: function(index)
+        {
+            var transaction = this.transactions[index];
+            
+            axios
+                .delete(this.delete_route + '/' + transaction.id)
+                .then(response => {
+                    this.$emit('singleTransactionDeleted',index);
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+                .finally(() => {
+                    this.clearForm();
+                });
         },
     }
 }

@@ -4,10 +4,10 @@
             <div class="col-lg-3">
                 <select v-model="transaction.user_email" class="form-control">
                     <option 
-                        v-for="(account_name, account_email) in accounts" 
-                        :value="account_email"
-                        :key="account_email"
-                    >{{account_name}}</option>
+                        v-for="account in accounts" 
+                        :value="account.email"
+                        :key="account.email"
+                    >{{account.name}} | {{account.email}}</option>
                 </select>
             </div>
             <div class="col-lg-3">
@@ -33,11 +33,12 @@
 </template>
 
 <script>
+import { setTimeout } from 'timers';
 export default {
     name: 'newRecordForm',
     props: {
         accounts: {
-            type: Object,
+            type: [Array, Object],
             required: true  
         },
         create_route: {
@@ -64,7 +65,7 @@ export default {
                 .post(this.create_route, this.transaction)
                 .then(response => {
                     this.$emit('newTransactionAdded', {
-                        transaction: response.data
+                        transaction: response.data.original
                     });
                 })
                 .catch(error => {

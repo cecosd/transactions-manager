@@ -19,13 +19,21 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/transactions-manager/data', function () {
-    return response()->json((new \App\Services\TransactionService())->getAllTransactions());
-})->name('transactions-manager-get-data');
+    return response()->json((new \App\Services\TransactionsManagerService())->getAllTransactions());
+})->name('transactions-manager-get-transactions');
+
+Route::get('/transactions-manager/accounts', function () {
+    return response()->json((new \App\Services\TransactionsManagerService())->getAllAccounts());
+})->name('transactions-manager-get-accounts');
 
 Route::post('/transactions-manager/store', function (NewTransactionRequest $request) {
-    return response()->json((new \App\Services\TransactionService())->storeTransaction($request));
+    return response()->json((new \App\Services\TransactionsManagerService())->storeTransaction($request));
 })->name('transactions-manager-create-transaction');
 
-Route::post('/transactions-manager/update', function (Request $request) {
-    return response()->json((new \App\Services\TransactionService())->updateTransaction($request));
+Route::put('/transactions-manager/update', function (Request $request) {
+    return response()->json((new \App\Services\TransactionsManagerService())->updateTransaction($request));
 })->name('transactions-manager-update-transaction');
+
+Route::delete('/transactions-manager/delete/{transaction?}', function ($transaction) {
+    return response()->json((new \App\Services\TransactionsManagerService())->deleteTransaction($transaction));
+})->name('transactions-manager-delete-transaction');

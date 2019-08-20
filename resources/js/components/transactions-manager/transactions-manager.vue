@@ -30,10 +30,15 @@
                 </div>
             </div> 
         </div>
-
+        
         <component 
             :is="'data-table'"
-            :transactions="formattedTransactions"
+            @singleTransactionUpdated="singleTransactionUpdated"
+            @singleTransactionDeleted="singleTransactionDeleted"
+            :transactions="transactions"
+            :search_query="search_query"
+            :update_route="update_route"
+            :delete_route="delete_route"
         ></component>
 
         <component 
@@ -43,6 +48,7 @@
             @clearSearchForm="clearSearchForm"
             @newTransactionAdded="addToTransactions"
         ></component>
+
     </div>
 </template>
 
@@ -61,6 +67,18 @@ export default {
             type: String,
             required: true
         },
+        update_route: {
+            type: String,
+            required: true
+        },
+        delete_route: {
+            type: String,
+            required: true
+        },
+        accounts_route: {
+            type: String,
+            required: true
+        },
     },
     components: {
         dataTable,
@@ -73,27 +91,22 @@ export default {
             search_query: '',
         }
     },
-    computed: {
-        formattedTransactions: function(){
-            var vm = this;
-            var query = vm.search_query;
-            return this.transactions.filter(function(transaction){
-                
-                vm.accounts_dropdown_list[transaction.account_user_email] = transaction.account_user_name;
-                
-                return (transaction.amount.indexOf(query) > -1
-                        || transaction.account_user_name.indexOf(query) > -1
-                        || transaction.account_user_email.indexOf(query) > -1
-                        || transaction.type.indexOf(query) > -1) ? true : false;
-            });
-        }
-    },
     methods: {
-        getData: function(){
+        getTransactions: function(){
             axios
                 .get(this.data_route)
                 .then(response => {
-                    this.transactions = response.data;
+                    this.transactions = response.data.original;
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        },
+        getAccounts: function(){
+            axios
+                .get(this.accounts_route)
+                .then(response => {
+                    this.accounts_dropdown_list = response.data.original;
                 })
                 .catch(err => {
                     console.log(err);
@@ -123,10 +136,19 @@ export default {
         addToTransactions: function(data)
         {
             this.transactions.push(data.transaction);
+        },
+        singleTransactionUpdated: function(data)
+        {
+            this.transactions[data.index] = data.transaction;
+        },
+        singleTransactionDeleted: function(index)
+        {
+            this.transactions.splice(index, 1);
         }
     },
     created(){
-        this.getData();
+        this.getTransactions();
+        this.getAccounts();
     }
 }
 </script>
