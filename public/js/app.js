@@ -11712,6 +11712,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'newRecordForm',
@@ -11766,6 +11767,10 @@ __webpack_require__.r(__webpack_exports__);
       for (var index in this.transaction) {
         this.transaction[index] = null;
       }
+    },
+    hideForm: function hideForm() {
+      this.clearAddTransactionForm();
+      this.toggleNewMode();
     }
   }
 });
@@ -47608,6 +47613,19 @@ var render = function() {
                 }
               },
               [_vm._v("Submit")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-default",
+                on: {
+                  click: function($event) {
+                    return _vm.hideForm()
+                  }
+                }
+              },
+              [_vm._v("Discard")]
             )
           ])
         ])

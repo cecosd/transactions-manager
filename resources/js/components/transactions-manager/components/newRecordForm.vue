@@ -21,6 +21,7 @@
             </div>
             <div class="col-lg-3">
                 <button class="btn btn-primary" @click="addTransaction()">Submit</button>
+                <button class="btn btn-default" @click="hideForm()">Discard</button>
             </div>
         </div>
         <button v-if="!show_form" class="btn btn-primary" @click="toggleNewMode()">
@@ -90,6 +91,10 @@ export default {
             {
                this.transaction[index] = null;
             }
+        },
+        hideForm: function(){
+            this.clearAddTransactionForm();
+            this.toggleNewMode();
         },
     }
 }
