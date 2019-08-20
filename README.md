@@ -19,3 +19,8 @@ php artisan db:seed --class=UserTransactionAccountsSeeder
 OR 
 
 php artisan db:seed
+
+
+# Launch
+
+php artisan serve
