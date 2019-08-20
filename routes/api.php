@@ -25,3 +25,7 @@ Route::get('/transactions-manager/data', function () {
 Route::post('/transactions-manager/store', function (NewTransactionRequest $request) {
     return response()->json((new \App\Services\TransactionService())->storeTransaction($request));
 })->name('transactions-manager-create-transaction');
+
+Route::post('/transactions-manager/update', function (Request $request) {
+    return response()->json((new \App\Services\TransactionService())->updateTransaction($request));
+})->name('transactions-manager-update-transaction');

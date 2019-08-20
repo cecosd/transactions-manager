@@ -7,6 +7,7 @@
             <transactions-manager
                 data_route="{{route('transactions-manager-get-data')}}"
                 create_route="{{route('transactions-manager-create-transaction')}}"
+                update_route="{{route('transactions-manager-update-transaction')}}"
             ></transactions-manager>
         </div>
     </div>

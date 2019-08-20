@@ -1,93 +1,55 @@
 <template>
     <div>
-        <div class="col-lg-3">
-            <div class="input-group mb-3">
-                <input 
-                    type="text" 
-                    class="form-control" 
-                    placeholder="Type here..." 
-                    aria-label="Type here"
-                    v-model="search_query" 
-                    >
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="input-group mb-3">
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Type here..." 
+                        aria-label="Type here"
+                        v-model="search_query" 
+                        >
 
-                <div class="input-group-append">
-                    <div class="btn btn-outline-primary" >Search</div>
+                    <div class="input-group-append">
+                        <div class="btn btn-outline-primary" >Search</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-3">
-            <div class="btn-group">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Sort
-                </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" @click="sortById('asc')">ID Asc</a>
-                    <a class="dropdown-item" @click="sortById('desc')">ID Desc</a>
-                    <a class="dropdown-item" @click="sortByName('asc')">Name Asc</a>
-                    <a class="dropdown-item" @click="sortByName('desc')">Name Desc</a>
+            <div class="col-lg-9">
+                <div class="btn-group float-lg-right">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Sort
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" @click="sortById('asc')">ID Asc</a>
+                        <a class="dropdown-item" @click="sortById('desc')">ID Desc</a>
+                        <a class="dropdown-item" @click="sortByName('asc')">Name Asc</a>
+                        <a class="dropdown-item" @click="sortByName('desc')">Name Desc</a>
+                    </div>
                 </div>
-            </div>
+            </div> 
         </div>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">User(Balance)</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr 
-                    v-for="transaction in formattedTransactions" :key="transaction.id"
-                    :class="{'table-danger': transaction.is_debit, 'table-success': transaction.is_credit}"
-                >
-                    <td>{{transaction.id}}</td>
-                    <td>{{transaction.account_user_name}}({{transaction.account_balance}})</td>
-                    <td>{{transaction.type}}</td>
-                    <td>{{transaction.formatted_amount}}</td>
-                </tr>
-            </tbody>
-        </table>  
+        <component 
+            :is="'data-table'"
+            :transactions="formattedTransactions"
+        ></component>
 
-        <div 
-            v-if="new_transaction_mode"
-            class="row"
-        >
-            <div class="col-lg-3">
-                <select v-model="new_transaction.user_email" class="form-control">
-                    <option 
-                        v-for="(list_item_name, list_item_email) in accounts_dropdown_list" 
-                        :value="list_item_email"
-                        :key="list_item_email"
-                    >{{list_item_name}}</option>
-                </select>
-            </div>
-            <div class="col-lg-3">
-                <select v-model="new_transaction.type" class="form-control">
-                    <option value="Debit">Debit</option>
-                    <option value="Credit">Credit</option>
-                </select>
-            </div>
-            <div class="col-lg-3">
-                <input type="number" min="1" v-model="new_transaction.amount" class="form-control" placeholder="Amount" aria-label="Amount">
-            </div>
-            <div class="col-lg-3">
-                <button class="btn btn-primary" @click="addTransaction()">Submit</button>
-            </div>
-        </div>
-        <button v-if="!new_transaction_mode" class="btn btn-primary" @click="toggleNewMode()">
-            Add transaction
-        </button>
-        <ul>
-            <li v-for="(error, error_key) in validationErrors" :key="error_key">{{error[0]}}</li>
-        </ul>
+        <component 
+            :is="'new-record-form'"
+            :accounts="accounts_dropdown_list"
+            :create_route="create_route"
+            @clearSearchForm="clearSearchForm"
+            @newTransactionAdded="addToTransactions"
+        ></component>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
+import dataTable from './components/dataTable.vue';
+import newRecordForm from './components/newRecordForm.vue';
 export default {
     name: 'TransactionsManager',
     props: {
@@ -100,18 +62,15 @@ export default {
             required: true
         },
     },
+    components: {
+        dataTable,
+        newRecordForm
+    },
     data() {
         return {
             transactions: [],
             accounts_dropdown_list: {},
             search_query: '',
-            new_transaction_mode: false,
-            new_transaction: {
-                amount: null,
-                type: null,
-                user_email: null,
-            },
-            validationErrors: [],
         }
     },
     computed: {
@@ -140,12 +99,6 @@ export default {
                     console.log(err);
                 });
         },
-        isDebit(type){
-            return (type == 'Debit');
-        },
-        isCredit(type){
-            return (type == 'Credit');
-        },
         sortByName: function(order)
         {
             if(order == 'asc')
@@ -164,36 +117,12 @@ export default {
             else 
                 return this.transactions;
         },
-        toggleNewMode: function(){
-            this.clearFormValidationErrors();
-            this.new_transaction_mode = !this.new_transaction_mode;
+        clearSearchForm: function(){
+            this.search_query = '';
         },
-        clearFormValidationErrors: function(){
-            this.validationErrors = [];
-        },
-        clearAddTransactionForm: function(){
-            for(var index in this.new_transaction)
-            {
-               this.new_transaction[index] = null;
-            }
-        },
-        addTransaction: function(){
-            this.toggleNewMode();
-            
-            axios
-                .post(this.create_route, this.new_transaction)
-                .then(response => {
-                    
-                    // this.transactions.push(response.data);
-                })
-                .catch(error => {
-                    if (error.response.status == 422){
-                        this.validationErrors = error.response.data.errors;
-                    }
-                })
-                .finally(() => {
-                    this.clearAddTransactionForm();
-                });
+        addToTransactions: function(data)
+        {
+            this.transactions.push(data.transaction);
         }
     },
     created(){
